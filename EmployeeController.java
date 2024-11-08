@@ -1,12 +1,6 @@
-package com.employeemgmt;
-
 package com.employeemgmt.employeemanagementsystem;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -16,8 +10,6 @@ public class EmployeeController {
 
     // Constructor injection of the EmployeeRepository
     private final EmployeeRepository employeeRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     // Constructor to inject EmployeeRepository dependency
     public EmployeeController(EmployeeRepository employeeRepository) {
@@ -48,7 +40,6 @@ public class EmployeeController {
         return employeeRepository.findEmployeesWithMaxSalary();
     }
 
-    //Find employees greater than given age
     @GetMapping("/retirement/{age}")
     public List<EmployeeData> getEmployeesWithRetirement(@PathVariable int age){
         return employeeRepository.findEmployeesWithAge(age);
