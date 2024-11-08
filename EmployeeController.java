@@ -1,73 +1,75 @@
-package com.employeemgmt.employeemanagementsystem;
+package com.employeemgmt;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
 
+    // Constructor injection of the EmployeeRepository
     private final EmployeeRepository employeeRepository;
 
+    // Constructor to inject EmployeeRepository dependency
     public EmployeeController(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
-    // Create a new employee
-    @PostMapping
-    public ResponseEntity<EmployeeData> createEmployee(@RequestBody EmployeeData employee) {
-        EmployeeData savedEmployee = employeeRepository.save(employee);
-        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
+    // Create multiple employees (Batch Handling)
+    @PostMapping("/post")
+    public String createEmployees(@RequestBody List<EmployeeData> employees) {
+        employeeRepository.saveAll(employees);
+        return "Employees created successfully!";
     }
 
     // Get all employees
-    @GetMapping
-    public ResponseEntity<List<EmployeeData>> getAllEmployees() {
-        List<EmployeeData> employees = employeeRepository.findAll();
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+    @GetMapping("/get")
+    public List<EmployeeData> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 
     // Get employee by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeData> getEmployeeById(@PathVariable int id) {
-        Optional<EmployeeData> employee = employeeRepository.findById(id);
-        return employee.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    @GetMapping("/get/{id}")
+    public EmployeeData getEmployeeById(@PathVariable int id) {
+        return employeeRepository.findById(id).orElse(null); // Return null if not found
     }
 
-    // Update an existing employee
-    @PutMapping("/{id}")
-    public ResponseEntity<EmployeeData> updateEmployee(@PathVariable int id, @RequestBody EmployeeData employeeDetails) {
-        Optional<EmployeeData> employee = employeeRepository.findById(id);
+    // Update an employee
+    @PutMapping("/update/{id}")
+    public String updateEmployee(@PathVariable int id, @RequestBody EmployeeData employeeDetails) {
+        EmployeeData employee = employeeRepository.findById(id).orElse(null);
 
-        if (employee.isPresent()) {
-            EmployeeData updatedEmployee = employee.get();
-            updatedEmployee.setEmpName(employeeDetails.getEmpName());
-            updatedEmployee.setAge(employeeDetails.getAge());
-            updatedEmployee.setSalary(employeeDetails.getSalary());
-            updatedEmployee.setDesignation(employeeDetails.getDesignation());
-            updatedEmployee.setContactNo(employeeDetails.getContactNo());
+        if (employee != null) {
+            employee.setEmpName(employeeDetails.getEmpName());
+            employee.setAge(employeeDetails.getAge());
+            employee.setSalary(employeeDetails.getSalary());
+            employee.setDesignation(employeeDetails.getDesignation());
+            employee.setContactNo(employeeDetails.getContactNo());
 
-            employeeRepository.save(updatedEmployee);
-            return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+            employeeRepository.save(employee);
+            return "Employee updated successfully!";
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return "Employee not found!";
         }
     }
 
     // Delete an employee
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable int id) {
+    @DeleteMapping("/delete/{id}")
+    public String deleteEmployee(@PathVariable int id) {
         if (employeeRepository.existsById(id)) {
             employeeRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return "Employee deleted successfully!";
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return "Employee not found!";
         }
     }
+    
+    // Delete all employees
+    @DeleteMapping("/deleteAll")
+    public String deleteAllEmployees() {
+        employeeRepository.deleteAll();
+        return "All employees deleted successfully!";
+    }
+
 }
