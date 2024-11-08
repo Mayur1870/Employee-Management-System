@@ -1,5 +1,7 @@
-package com.employeemgmt.employeemanagementsystem;
+package com.employeemgmt.employeemanagementsystem.controller;
 
+import com.employeemgmt.employeemanagementsystem.entity.EmployeeData;
+import com.employeemgmt.employeemanagementsystem.repo.EmployeeRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
